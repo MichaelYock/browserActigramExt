@@ -1,0 +1,358 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #333;
+  min-height: 100vh;
+  margin: 0;
+  padding: 20px;
+}
+
+.container {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 1200px;
+  margin: 0 auto;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+header {
+  text-align: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #1565C0;
+}
+
+h1 {
+  color: #1565C0;
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.subtitle {
+  color: #666;
+  font-size: 14px;
+}
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 10px;
+  background: #f5f5f5;
+  border-radius: 6px;
+}
+
+.date-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.date-display {
+  font-weight: 500;
+  color: #333;
+  min-width: 200px;
+  text-align: center;
+}
+
+.view-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.view-controls label {
+  font-size: 14px;
+  color: #666;
+}
+
+.view-controls select {
+  padding: 5px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-small {
+  padding: 4px 12px;
+  font-size: 16px;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn-secondary {
+  background: #1565C0;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #0d47a1;
+}
+
+#chart-container {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+  min-height: 300px;
+}
+
+#actigram {
+  width: 100%;
+  height: auto;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-label {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.stat-value {
+  display: block;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1565C0;
+}
+
+.legend {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+
+.legend h3 {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.legend-items {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+}
+
+.legend-color {
+  width: 30px;
+  height: 20px;
+  border-radius: 3px;
+  border: 1px solid #ddd;
+}
+
+footer {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.tooltip {
+  position: absolute;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  border-radius: 4px;
+  font-size: 12px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 1000;
+  white-space: nowrap;
+}
+
+.tooltip.visible {
+  opacity: 1;
+}
+
+/* Chart specific styles */
+.axis text {
+  font-size: 11px;
+  fill: #666;
+}
+
+.axis line,
+.axis path {
+  stroke: #ddd;
+}
+
+.activity-cell {
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.activity-cell:hover {
+  opacity: 0.8;
+  stroke: #333;
+  stroke-width: 1;
+}
+
+/* Loading state */
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  font-style: italic;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+}
+
+.empty-state h3 {
+  margin-bottom: 10px;
+  color: #666;
+}
+
+.empty-state p {
+  font-size: 14px;
+}
+
+/* Print styles for Save as PDF */
+@media print {
+
+  /* Hide controls and non-essential elements */
+  .controls,
+  .stats,
+  footer,
+  .subtitle,
+  #tooltip {
+    display: none !important;
+  }
+
+  /* Reset container constraints */
+  body,
+  .container {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+    box-shadow: none !important;
+  }
+
+  /* Ensure chart is visible and stays together */
+  #chart-container {
+    width: 100% !important;
+    margin: 20px 0 !important;
+    display: block !important;
+    border: none !important;
+    page-break-inside: avoid !important;
+    overflow: visible !important;
+  }
+
+  /* Ensure SVG doesn't get cut off */
+  #actigram {
+    page-break-inside: avoid !important;
+    overflow: visible !important;
+  }
+
+  /* Force background colors to print - CRITICAL for SVG colors */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Specifically force SVG elements to print colors */
+  svg,
+  rect,
+  path,
+  circle,
+  line,
+  text {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Header styling for print */
+  header {
+    text-align: center;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #333;
+    padding-bottom: 10px;
+  }
+
+  h1 {
+    font-size: 24px !important;
+    color: #000 !important;
+    margin: 0 !important;
+  }
+
+  /* Add print date */
+  header::after {
+    content: "Generated on " attr(data-date);
+    display: block;
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+  }
+
+  /* Legend styling for print */
+  .legend {
+    page-break-inside: avoid;
+    margin-top: 30px;
+    border: none !important;
+    padding: 0 !important;
+  }
+}

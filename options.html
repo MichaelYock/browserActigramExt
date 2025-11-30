@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebActigram Settings</title>
+    <link rel="stylesheet" href="options.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>WebActigram Settings</h1>
+            <p class="subtitle">Configure your activity tracking preferences</p>
+        </header>
+
+        <main>
+            <section class="settings-section">
+                <h2>Data Collection</h2>
+
+                <div class="setting-item">
+                    <label for="epochDuration">
+                        <strong>Time Epoch Duration</strong>
+                        <span class="description">How often to record activity snapshots</span>
+                    </label>
+                    <select id="epochDuration" class="setting-input">
+                        <option value="5">5 minutes</option>
+                        <option value="10">10 minutes</option>
+                        <option value="15" selected>15 minutes</option>
+                        <option value="30">30 minutes</option>
+                    </select>
+                </div>
+
+                <div class="setting-item">
+                    <label for="idleThreshold">
+                        <strong>Idle Detection Threshold</strong>
+                        <span class="description">How long before browser is considered idle</span>
+                    </label>
+                    <select id="idleThreshold" class="setting-input">
+                        <option value="15" selected>15 seconds</option>
+                        <option value="30">30 seconds</option>
+                        <option value="60">60 seconds</option>
+                    </select>
+                </div>
+            </section>
+
+            <section class="settings-section">
+                <h2>Visualization</h2>
+
+                <div class="setting-item">
+                    <label for="plotType">
+                        <strong>Plot Type</strong>
+                        <span class="description">Choose how the actigram chart is displayed</span>
+                    </label>
+                    <select id="plotType" class="setting-input">
+                        <option value="single">Single Plot (24h)</option>
+                        <option value="double">Double Plot (48h)</option>
+                    </select>
+                </div>
+            </section>
+
+            <section class="settings-section">
+                <h2>Data Storage</h2>
+
+                <div class="setting-item">
+                    <label for="retentionDays">
+                        <strong>Data Retention Period</strong>
+                        <span class="description">How long to keep activity data</span>
+                    </label>
+                    <select id="retentionDays" class="setting-input">
+                        <option value="30">30 days</option>
+                        <option value="60">60 days</option>
+                        <option value="90" selected>90 days</option>
+                        <option value="180">180 days</option>
+                    </select>
+                </div>
+
+                <div class="setting-item">
+                    <div class="info-box">
+                        <strong>Storage Info</strong>
+                        <p>Total data points: <span id="dataPointCount">Loading...</span></p>
+                        <p>Oldest data: <span id="oldestData">Loading...</span></p>
+                        <p>Newest data: <span id="newestData">Loading...</span></p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="settings-section">
+                <h2>Data Management</h2>
+
+                <div class="setting-item">
+                    <label>
+                        <strong>Export Data</strong>
+                        <span class="description">Download all your activity data as JSON</span>
+                    </label>
+                    <button id="exportBtn" class="btn btn-primary">Export Data</button>
+                </div>
+
+                <div class="setting-item">
+                    <label>
+                        <strong>Import Data</strong>
+                        <span class="description">Upload and merge data from another device</span>
+                    </label>
+                    <div class="import-controls">
+                        <input type="file" id="importFile" accept=".json" style="display: none;">
+                        <button id="importBtn" class="btn btn-primary">Choose File</button>
+                        <span id="fileName" class="file-name">No file selected</span>
+                    </div>
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" id="mergeData" checked>
+                            Merge with existing data (uncheck to replace)
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-item danger-zone">
+                    <label>
+                        <strong>Clear All Data</strong>
+                        <span class="description warning">⚠️ This will permanently delete all activity data</span>
+                    </label>
+                    <button id="clearDataBtn" class="btn btn-danger">Clear All Data</button>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <div class="save-status" id="saveStatus"></div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="indexeddb-manager.js"></script>
+    <script src="storage-manager.js"></script>
+    <script src="options.js"></script>
+</body>
+
+</html>
