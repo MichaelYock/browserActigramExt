@@ -225,7 +225,7 @@ const StorageManager = {
 
             // Map epochs to export format
             const epochs = activityData.map(item => ({
-                t: new Date(item.timestamp).toISOString(),
+                time: new Date(item.timestamp).toISOString(),
                 activity: item.activityScore
             }));
 
@@ -257,7 +257,7 @@ const StorageManager = {
                 const epochDuration = (importData.epoch_length_seconds || 900) / 60;
 
                 processedData = importData.epochs.map(item => ({
-                    timestamp: new Date(item.t).getTime(),
+                    timestamp: new Date(item.time || item.t).getTime(),
                     activityScore: item.activity,
                     epochDuration: epochDuration
                 }));

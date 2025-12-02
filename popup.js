@@ -197,8 +197,7 @@ async function loadAndDisplayData() {
         // Render chart
         ActigramChart.render(activityData, daysToShow, settings.epochDuration, settings.plotType);
 
-        // Update statistics
-        updateStatistics();
+
 
     } catch (error) {
         console.error('Error loading data:', error);
@@ -227,30 +226,7 @@ function updateDateRangeDisplay(startDate, endDate) {
     document.getElementById('nextDay').disabled = isAllTime;
 }
 
-/**
- * Update statistics display
- */
-function updateStatistics() {
-    if (!activityData || activityData.length === 0) {
-        document.getElementById('totalActivity').textContent = '0%';
-        document.getElementById('avgScore').textContent = '0%';
-        document.getElementById('dataPoints').textContent = '0';
-        return;
-    }
 
-    // Calculate total activity (sum of all scores)
-    const totalScore = activityData.reduce((sum, epoch) => sum + epoch.activityScore, 0);
-    const avgScore = Math.round(totalScore / activityData.length);
-
-    // Calculate total activity percentage
-    const maxPossibleScore = activityData.length * 100;
-    const totalActivityPercent = Math.round((totalScore / maxPossibleScore) * 100);
-
-    // Update display
-    document.getElementById('totalActivity').textContent = `${totalActivityPercent}%`;
-    document.getElementById('avgScore').textContent = `${avgScore}%`;
-    document.getElementById('dataPoints').textContent = activityData.length.toLocaleString();
-}
 
 /**
  * Export data to JSON file
