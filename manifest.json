@@ -8,6 +8,9 @@
     "storage",
     "alarms"
   ],
+  "optional_permissions": [
+    "history"
+  ],
   "background": {
     "service_worker": "background.js"
   },

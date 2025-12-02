@@ -154,8 +154,23 @@ const StorageManager = {
      * Save an activity epoch
      * @param {Object} epoch - { timestamp, activityScore, epochDuration }
      */
+    /**
+     * Save an activity epoch
+     * @param {Object} epoch - { timestamp, activityScore, epochDuration, trackerScore, historyScore }
+     */
     async saveActivityEpoch(epoch) {
         try {
+            // Ensure we preserve existing scores if not provided
+            // This is handled by _mergeActivityData logic usually, but for direct saves:
+            // If we are saving from tracker (background.js), we set trackerScore.
+            // We should calculate total activityScore here too.
+
+            if (epoch.trackerScore !== undefined || epoch.historyScore !== undefined) {
+                const tracker = epoch.trackerScore || 0;
+                const history = epoch.historyScore || 0;
+                epoch.activityScore = Math.max(tracker, history);
+            }
+
             await IndexedDBManager.saveActivityEpoch(epoch);
         } catch (error) {
             console.error('Error saving activity epoch:', error);
@@ -288,6 +303,131 @@ const StorageManager = {
             console.error('Error importing data:', error);
             return false;
         }
+    },
+
+    /**
+     * Import history visits
+     * @param {Array} visits - Array of visit objects from chrome.history.getVisits
+     * @param {number} epochDuration - Duration in minutes
+     */
+    async importHistoryData(visits, epochDuration = 15) {
+        try {
+            const epochDurationMs = epochDuration * 60 * 1000;
+            const historyEpochs = new Map();
+
+            // Group visits by epoch
+            for (const visit of visits) {
+                const timestamp = visit.visitTime || visit.visit_time; // Handle different property names if any
+                if (!timestamp) continue;
+
+                // Normalize to epoch start
+                const epochStart = Math.floor(timestamp / epochDurationMs) * epochDurationMs;
+
+                if (!historyEpochs.has(epochStart)) {
+                    historyEpochs.set(epochStart, 0);
+                }
+                historyEpochs.set(epochStart, historyEpochs.get(epochStart) + 1);
+            }
+
+            // Convert to epoch objects
+            const newEpochs = [];
+            for (const [timestamp, visitCount] of historyEpochs) {
+                // Calculate score: min(100, visits * 10)
+                const historyScore = Math.min(100, visitCount * 10);
+
+                newEpochs.push({
+                    timestamp: timestamp,
+                    historyScore: historyScore,
+                    epochDuration: epochDuration
+                });
+            }
+
+            // Merge with existing data
+            const existingData = await this.getActivityData();
+            const mergedData = this._mergeHistoryData(existingData, newEpochs);
+
+            // Save back
+            await IndexedDBManager.saveActivityEpochs(mergedData);
+
+            return true;
+        } catch (error) {
+            console.error('Error importing history data:', error);
+            return false;
+        }
+    },
+
+    /**
+     * Delete all imported history data
+     */
+    async deleteHistoryData() {
+        try {
+            const allData = await this.getActivityData();
+            const cleanedData = [];
+            let deletedCount = 0;
+
+            for (const epoch of allData) {
+                if (epoch.historyScore !== undefined) {
+                    delete epoch.historyScore;
+
+                    // Recalculate activity score
+                    const tracker = epoch.trackerScore || 0;
+                    epoch.activityScore = tracker;
+
+                    // Only keep if there is still tracker data or activity > 0
+                    if (epoch.activityScore > 0 || epoch.trackerScore !== undefined) {
+                        cleanedData.push(epoch);
+                    } else {
+                        deletedCount++;
+                    }
+                } else {
+                    cleanedData.push(epoch);
+                }
+            }
+
+            // We need to clear and save because some epochs might be deleted entirely
+            await IndexedDBManager.clearAllData();
+            await IndexedDBManager.saveActivityEpochs(cleanedData);
+
+            console.log(`Deleted history from ${allData.length} epochs, removed ${deletedCount} empty epochs`);
+            return true;
+        } catch (error) {
+            console.error('Error deleting history data:', error);
+            return false;
+        }
+    },
+
+    /**
+     * Merge history data into existing epochs
+     * @private
+     */
+    _mergeHistoryData(existing, historyEpochs) {
+        const merged = [...existing];
+        const existingMap = new Map(existing.map(e => [e.timestamp, e]));
+
+        for (const hEpoch of historyEpochs) {
+            if (existingMap.has(hEpoch.timestamp)) {
+                // Update existing
+                const existingEpoch = existingMap.get(hEpoch.timestamp);
+                existingEpoch.historyScore = hEpoch.historyScore;
+
+                // Recalculate max score
+                const tracker = existingEpoch.trackerScore || 0; // If undefined, assume 0 for calculation, but keep undefined in object if not present? 
+                // Actually, if trackerScore is undefined but activityScore exists (from old data), we should have migrated it.
+                // But let's be safe.
+                const currentActivity = existingEpoch.activityScore || 0;
+                // If trackerScore is missing, use currentActivity as tracker score proxy? 
+                // No, migration should handle it.
+
+                existingEpoch.activityScore = Math.max(tracker, existingEpoch.historyScore);
+            } else {
+                // Add new
+                hEpoch.activityScore = hEpoch.historyScore;
+                merged.push(hEpoch);
+            }
+        }
+
+        merged.sort((a, b) => a.timestamp - b.timestamp);
+        return merged;
     },
 
     /**

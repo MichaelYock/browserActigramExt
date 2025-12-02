@@ -119,6 +119,27 @@
                     </div>
                 </div>
 
+                <div class="setting-item">
+                    <label>
+                        <strong>Import Browser History</strong>
+                        <span class="description">Import past activity from your browser history (timestamps
+                            only)</span>
+                    </label>
+                    <div class="history-import-controls">
+                        <button id="checkHistoryBtn" class="btn btn-primary">Check History</button>
+                        <div id="historyPreview" class="history-preview" style="display: none; margin-top: 10px;">
+                            <p id="historyCountMsg"></p>
+                            <div class="button-group" style="margin-top: 10px;">
+                                <button id="importHistoryBtn" class="btn btn-success">Import History</button>
+                                <button id="cancelHistoryBtn" class="btn btn-secondary">Cancel</button>
+                            </div>
+                        </div>
+                        <div id="historyDeleteControls" style="display: none; margin-top: 15px;">
+                            <button id="deleteHistoryBtn" class="btn btn-warning">Delete Imported History</button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="setting-item danger-zone">
                     <label>
                         <strong>Clear All Data</strong>

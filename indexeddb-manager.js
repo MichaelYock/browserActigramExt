@@ -5,7 +5,7 @@
 
 const IndexedDBManager = {
     DB_NAME: 'WebActigramDB',
-    DB_VERSION: 1,
+    DB_VERSION: 2,
     STORES: {
         EPOCHS: 'epochs',
         CURRENT_EPOCH: 'currentEpoch'
@@ -34,6 +34,7 @@ const IndexedDBManager = {
 
             request.onupgradeneeded = (event) => {
                 const db = event.target.result;
+                const oldVersion = event.oldVersion;
 
                 // Create epochs object store with timestamp index
                 if (!db.objectStoreNames.contains(this.STORES.EPOCHS)) {
@@ -51,6 +52,26 @@ const IndexedDBManager = {
                         keyPath: 'id'
                     });
                     console.log('Created currentEpoch object store');
+                }
+
+                // Migration for version 2: Add trackerScore to existing epochs
+                if (oldVersion < 2) {
+                    const transaction = request.transaction;
+                    const epochStore = transaction.objectStore(this.STORES.EPOCHS);
+
+                    epochStore.openCursor().onsuccess = (event) => {
+                        const cursor = event.target.result;
+                        if (cursor) {
+                            const updateData = cursor.value;
+                            // If it has activityScore but no trackerScore, assume it's all tracker data
+                            if (updateData.activityScore !== undefined && updateData.trackerScore === undefined) {
+                                updateData.trackerScore = updateData.activityScore;
+                                cursor.update(updateData);
+                            }
+                            cursor.continue();
+                        }
+                    };
+                    console.log('Migrated data to version 2 (added trackerScore)');
                 }
             };
         });
