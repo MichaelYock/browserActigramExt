@@ -79,15 +79,23 @@ const ActigramChart = {
         const hoursPerRow = plotType === 'double' ? 48 : 24;
         const epochsPerRow = (hoursPerRow * 60) / epochDuration;
         const cellWidth = this.config.width / epochsPerRow;
-        this.config.height = gridData.length * this.config.cellHeight;
+
+        // Calculate cellHeight so that height = width of one hour
+        // For a 15-min epoch: cellHeight = cellWidth * 4 (4 epochs per hour)
+        // For a 60-min epoch: cellHeight = cellWidth * 1 (1 epoch per hour)
+        const cellHeight = cellWidth * (60 / epochDuration);
+        this.config.cellHeight = cellHeight;
+        this.config.height = gridData.length * cellHeight;
 
         // Set SVG dimensions
         const totalWidth = this.config.width + this.config.margin.left + this.config.margin.right;
         const totalHeight = this.config.height + this.config.margin.top + this.config.margin.bottom;
 
         this.config.svg
-            .attr('width', totalWidth)
-            .attr('height', totalHeight);
+            .attr('viewBox', `0 0 ${totalWidth} ${totalHeight}`)
+            .attr('preserveAspectRatio', 'xMinYMin meet')
+            .style('width', '100%')
+            .style('height', 'auto');
 
         // Create main group
         const g = this.config.svg.append('g')
@@ -155,9 +163,13 @@ const ActigramChart = {
                 const width = cellWidth - this.config.cellPadding;
                 const height = this.config.cellHeight - this.config.cellPadding;
 
-                // Skip if activityScore is 0/null to keep background clean? 
-                // Or draw light box? Let's draw everything for now.
-                const fillColor = this.config.colorScale(epoch.activityScore);
+                // Use white/transparent for epochs with no activity
+                let fillColor;
+                if (!epoch.hasData || epoch.activityScore === 0) {
+                    fillColor = 'white';
+                } else {
+                    fillColor = this.config.colorScale(epoch.activityScore);
+                }
 
                 g.append('rect')
                     .attr('class', 'activity-cell')

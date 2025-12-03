@@ -130,7 +130,9 @@ function setupEventListeners() {
     // Save as PDF button
     document.getElementById('printBtn').addEventListener('click', () => {
         // Set date for print header
-        document.querySelector('header').setAttribute('data-date', new Date().toLocaleDateString());
+        const dateStr = new Date().toLocaleDateString();
+        document.querySelector('header').setAttribute('data-date', dateStr);
+        document.getElementById('chart-container').setAttribute('data-date', dateStr);
         window.print();
     });
 

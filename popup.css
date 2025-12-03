@@ -243,8 +243,10 @@ footer {
 
 /* Print styles for Save as PDF */
 @media print {
+  @page {
+    margin: 0.5cm;
+  }
 
-  /* Hide controls and non-essential elements */
   .controls,
   footer,
   .subtitle,
@@ -252,78 +254,106 @@ footer {
     display: none !important;
   }
 
-  /* Reset container constraints */
-  body,
-  .container {
+  html,
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
     width: 100% !important;
-    max-width: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  .container {
     margin: 0 !important;
     padding: 0 !important;
     background: white !important;
     box-shadow: none !important;
-  }
-
-  /* Ensure chart is visible and stays together */
-  #chart-container {
     width: 100% !important;
-    margin: 20px 0 !important;
+    max-width: 100% !important;
     display: block !important;
-    border: none !important;
-    page-break-inside: avoid !important;
-    overflow: visible !important;
   }
 
-  /* Ensure SVG doesn't get cut off */
-  #actigram {
-    page-break-inside: avoid !important;
-    overflow: visible !important;
-  }
-
-  /* Force background colors to print - CRITICAL for SVG colors */
-  * {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-
-  /* Specifically force SVG elements to print colors */
-  svg,
-  rect,
-  path,
-  circle,
-  line,
-  text {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-
-  /* Header styling for print */
   header {
-    text-align: center;
-    margin-bottom: 30px;
-    border-bottom: 2px solid #333;
-    padding-bottom: 10px;
+    display: flow-root !important;
+    margin: 0 !important;
+    padding: 2px 0 !important;
+    border-bottom: 1px solid #333;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
   }
 
-  h1 {
-    font-size: 24px !important;
-    color: #000 !important;
+  header::after {
+    content: "Generated " attr(data-date);
+    display: inline !important;
+    font-size: 8px !important;
     margin: 0 !important;
   }
 
-  /* Add print date */
-  header::after {
-    content: "Generated on " attr(data-date);
-    display: block;
-    font-size: 12px;
-    color: #666;
-    margin-top: 5px;
+  h1 {
+    font-size: 12px !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
-  /* Legend styling for print */
-  .legend {
-    page-break-inside: avoid;
-    margin-top: 30px;
-    border: none !important;
+  header,
+  header * {
+    page-break-before: avoid !important;
+    page-break-after: avoid !important;
+    break-before: avoid !important;
+    break-after: avoid !important;
+  }
+
+  #chart-container {
+    margin: 0 !important;
     padding: 0 !important;
+    border: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+    page-break-before: avoid !important;
+    break-before: avoid !important;
+    display: block !important;
+    background: white !important;
+  }
+
+  #actigram {
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100% !important;
+    display: block !important;
+  }
+
+  header,
+  #chart-container {
+    margin: 0 !important;
+  }
+
+  header+#chart-container {
+    page-break-before: avoid !important;
+    break-before: avoid !important;
+  }
+
+  .legend {
+    margin: 2px 0 !important;
+    padding: 2px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .legend h3 {
+    font-size: 10px !important;
+    margin-bottom: 2px !important;
+  }
+
+  .legend-item {
+    font-size: 8px !important;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 }
