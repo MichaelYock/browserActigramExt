@@ -113,8 +113,9 @@ function setupEventListeners() {
             await StorageManager.saveUIPreferences({ daysToShow: currentDaysToShow });
 
             loadAndDisplayData();
+            loadAndDisplayData();
         } else {
-            alert('Please select a valid date range (start date must be before or equal to end date)');
+            UIUtils.showToast('Please select a valid date range (start date must be before or equal to end date)', 'error');
         }
     });
 
@@ -255,8 +256,7 @@ async function exportToPng() {
  * Show error message
  */
 function showError(message) {
-    // Simple error display - could be enhanced with a modal or toast
-    alert(message);
+    UIUtils.showToast(message, 'error');
 }
 
 // Initialize when DOM is ready

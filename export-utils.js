@@ -12,7 +12,11 @@ const ExportUtils = {
             const exportObject = await StorageManager.exportData();
 
             if (!exportObject) {
-                alert('Failed to export data');
+                if (typeof UIUtils !== 'undefined') {
+                    UIUtils.showToast('Failed to export data', 'error');
+                } else {
+                    alert('Failed to export data');
+                }
                 return;
             }
 
@@ -34,7 +38,11 @@ const ExportUtils = {
             return true;
         } catch (error) {
             console.error('Error exporting JSON:', error);
-            alert('Failed to export data');
+            if (typeof UIUtils !== 'undefined') {
+                UIUtils.showToast('Failed to export data', 'error');
+            } else {
+                alert('Failed to export data');
+            }
             return false;
         }
     },
@@ -48,7 +56,11 @@ const ExportUtils = {
             const activityData = data || await StorageManager.getActivityData();
 
             if (!activityData || activityData.length === 0) {
-                alert('No data to export');
+                if (typeof UIUtils !== 'undefined') {
+                    UIUtils.showToast('No data to export', 'info');
+                } else {
+                    alert('No data to export');
+                }
                 return false;
             }
 
@@ -90,7 +102,11 @@ const ExportUtils = {
             return true;
         } catch (error) {
             console.error('Error exporting CSV:', error);
-            alert('Failed to export CSV');
+            if (typeof UIUtils !== 'undefined') {
+                UIUtils.showToast('Failed to export CSV', 'error');
+            } else {
+                alert('Failed to export CSV');
+            }
             return false;
         }
     },
@@ -103,7 +119,11 @@ const ExportUtils = {
             const svg = document.getElementById(svgElementId);
             if (!svg) {
                 console.error('SVG element not found');
-                alert('Chart not found. Please ensure the chart is loaded.');
+                if (typeof UIUtils !== 'undefined') {
+                    UIUtils.showToast('Chart not found. Please ensure the chart is loaded.', 'error');
+                } else {
+                    alert('Chart not found. Please ensure the chart is loaded.');
+                }
                 return false;
             }
 
@@ -155,7 +175,11 @@ const ExportUtils = {
                 img.onerror = function () {
                     URL.revokeObjectURL(url);
                     console.error('Error loading SVG image');
-                    alert('Failed to export PNG');
+                    if (typeof UIUtils !== 'undefined') {
+                        UIUtils.showToast('Failed to export PNG', 'error');
+                    } else {
+                        alert('Failed to export PNG');
+                    }
                     reject(false);
                 };
 
@@ -163,7 +187,11 @@ const ExportUtils = {
             });
         } catch (error) {
             console.error('Error exporting PNG:', error);
-            alert('Failed to export PNG');
+            if (typeof UIUtils !== 'undefined') {
+                UIUtils.showToast('Failed to export PNG', 'error');
+            } else {
+                alert('Failed to export PNG');
+            }
             return false;
         }
     }

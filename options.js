@@ -445,16 +445,25 @@ async function clearAllData() {
  * Show status message
  */
 function showStatus(message, type = '') {
-    const statusEl = document.getElementById('saveStatus');
-    statusEl.textContent = message;
-    statusEl.className = 'save-status ' + type;
+    // Map legacy types to UIUtils types
+    const uiType = type === 'pending' ? 'pending' :
+        type === 'success' ? 'success' :
+            type === 'error' ? 'error' : 'info';
 
-    // Clear after 2 seconds for success
-    if (type === 'success') {
-        setTimeout(() => {
-            statusEl.textContent = '';
-            statusEl.className = 'save-status';
-        }, 2000);
+    UIUtils.showToast(message, uiType);
+
+    // Also update the legacy status element if it exists, for fallback
+    const statusEl = document.getElementById('saveStatus');
+    if (statusEl) {
+        statusEl.textContent = message;
+        statusEl.className = 'save-status ' + type;
+
+        if (type === 'success') {
+            setTimeout(() => {
+                statusEl.textContent = '';
+                statusEl.className = 'save-status';
+            }, 2000);
+        }
     }
 }
 

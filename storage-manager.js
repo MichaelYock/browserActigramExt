@@ -14,7 +14,7 @@ const StorageManager = {
     // Default settings
     DEFAULT_SETTINGS: {
         epochDuration: 15, // minutes
-        idleThreshold: 15, // seconds
+        idleThreshold: 60, // seconds
         retentionDays: -1, // -1 = Forever
         colorScheme: 'blue',
         plotType: 'double' // 'single' or 'double'
@@ -171,9 +171,19 @@ const StorageManager = {
                 epoch.activityScore = Math.max(tracker, history);
             }
 
+            console.log('Saving activity epoch:', JSON.stringify(epoch)); // Debug log
+
+            if (!epoch.timestamp) {
+                console.error('Invalid epoch timestamp:', epoch);
+                return;
+            }
+
             await IndexedDBManager.saveActivityEpoch(epoch);
         } catch (error) {
             console.error('Error saving activity epoch:', error);
+            // Log the error name and message specifically for DOMException
+            if (error.name) console.error('Error name:', error.name);
+            if (error.message) console.error('Error message:', error.message);
         }
     },
 
@@ -477,6 +487,30 @@ const StorageManager = {
             await IndexedDBManager.saveCurrentEpoch(epoch);
         } catch (error) {
             console.error('Error saving current epoch:', error);
+        }
+    },
+
+    /**
+     * Get tracking state (for service worker persistence)
+     */
+    async getTrackingState() {
+        try {
+            const result = await chrome.storage.local.get('trackingState');
+            return result.trackingState || null;
+        } catch (error) {
+            console.error('Error getting tracking state:', error);
+            return null;
+        }
+    },
+
+    /**
+     * Save tracking state
+     */
+    async saveTrackingState(state) {
+        try {
+            await chrome.storage.local.set({ trackingState: state });
+        } catch (error) {
+            console.error('Error saving tracking state:', error);
         }
     }
 };
