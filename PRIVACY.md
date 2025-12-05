@@ -15,6 +15,15 @@ Browser Actogram collects and stores the following data **locally on your device
 1. **Activity Timestamps**: The date and time when each activity measurement was taken
 2. **Activity Scores**: A numerical value (0-100) representing the percentage of time your browser was active during a time epoch
 3. **Settings**: Your preferences for epoch duration, idle threshold, and data retention
+4. **(Optional) History Timestamps**: If you use the "Import Browser History" feature, we temporarily read your history to extract activity timestamps. We **do not** store URLs or page titles.
+
+### Optional Features
+
+**Import Browser History**:
+If you choose to use this feature, the extension will request the `history` permission. This is used **solely** to backfill your activity chart by checking when you visited pages in the past.
+- We only extract the **time** of the visit.
+- We **discard** the URL and page title immediately.
+- This process happens entirely locally on your device.
 
 ### What We DO NOT Collect
 
@@ -75,8 +84,11 @@ Browser Actogram requests the following browser permissions:
 - **`storage`**: To save your activity data and settings locally
 - **`alarms`**: To periodically save data and clean up old entries
 
+### Optional Permissions
+
+- **`history`**: Requested ONLY if you use the "Import Browser History" feature. Used to backfill activity data from your past browsing.
+
 We do not request permissions for:
-- Browsing history
 - Tabs
 - Web requests
 - Cookies
