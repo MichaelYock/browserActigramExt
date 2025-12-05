@@ -50,9 +50,10 @@ class ActigramChart {
      * @param {Array} data - Activity data array
      * @param {number} daysToShow - Number of days to display
      * @param {number} epochDuration - Duration of each epoch in minutes
-     * @param {string} plotType - 'single' or 'double'
+     * @param {string} plotType - 'single' or 'double' (for linear view)
+     * @param {string} viewType - 'linear' or 'spiral'
      */
-    render(data, daysToShow = 2, epochDuration = 15, plotType = 'double') {
+    render(data, daysToShow = 2, epochDuration = 15, plotType = 'double', viewType = 'linear') {
         if (!this.config.svg) {
             console.error('Chart not initialized');
             return;
@@ -63,15 +64,31 @@ class ActigramChart {
 
         // Check if we have data
         if (!data || data.length === 0) {
-            this.renderEmptyState();
+            this.renderEmptyState(viewType);
             return;
         }
 
+        // Route to appropriate render method
+        if (viewType === 'spiral') {
+            this.renderSpiral(data, daysToShow, epochDuration);
+        } else {
+            this.renderLinear(data, daysToShow, epochDuration, plotType);
+        }
+    }
+
+    /**
+     * Render linear actigram chart
+     * @param {Array} data - Activity data array
+     * @param {number} daysToShow - Number of days to display
+     * @param {number} epochDuration - Duration of each epoch in minutes
+     * @param {string} plotType - 'single' or 'double'
+     */
+    renderLinear(data, daysToShow, epochDuration, plotType) {
         // Process data into grid format
         const gridData = this.processDataToGrid(data, daysToShow, epochDuration, plotType);
 
         if (gridData.length === 0) {
-            this.renderEmptyState();
+            this.renderEmptyState('linear');
             return;
         }
 
@@ -198,6 +215,152 @@ class ActigramChart {
     }
 
     /**
+     * Render spiral (circular) actigram chart
+     * @param {Array} data - Activity data array
+     * @param {number} daysToShow - Number of days to display (max 90)
+     * @param {number} epochDuration - Duration of each epoch in minutes
+     */
+    renderSpiral(data, daysToShow, epochDuration) {
+        // Cap at 90 days for spiral view
+        const MAX_SPIRAL_DAYS = 90;
+        const effectiveDays = Math.min(daysToShow, MAX_SPIRAL_DAYS);
+
+        // Spiral configuration
+        const baseRadius = 40;
+        const radialStep = 15;
+        const arcThickness = 10;
+        const epochAngleWidth = (epochDuration / 1440) * 2 * Math.PI;
+
+        // Calculate SVG size
+        const maxRadius = baseRadius + (effectiveDays * radialStep);
+        const svgSize = maxRadius * 2 + 100; // Padding
+        const centerX = svgSize / 2;
+        const centerY = svgSize / 2;
+
+        // Set SVG dimensions
+        this.config.svg
+            .attr('viewBox', `0 0 ${svgSize} ${svgSize}`)
+            .attr('preserveAspectRatio', 'xMidYMid meet')
+            .style('width', '100%')
+            .style('height', 'auto');
+
+        // Create main group
+        const g = this.config.svg.append('g')
+            .attr('transform', `translate(${centerX},${centerY})`);
+
+        // Process data into spiral format
+        const spiralData = this.processDataToSpiral(data, effectiveDays, epochDuration);
+
+        // Draw activity arcs
+        spiralData.forEach(({ dayIndex, minutesSinceMidnight, activityScore, hasData, timestamp }) => {
+            if (!hasData || activityScore === 0) return; // Skip empty epochs
+
+            const angle = (minutesSinceMidnight / 1440) * 2 * Math.PI; // 0 is top (12 o'clock) in d3.arc
+            const radius = baseRadius + (dayIndex * radialStep);
+
+            const arc = d3.arc()
+                .innerRadius(radius - arcThickness / 2)
+                .outerRadius(radius + arcThickness / 2)
+                .startAngle(angle - epochAngleWidth / 2)
+                .endAngle(angle + epochAngleWidth / 2);
+
+            const fillColor = this.config.colorScale(activityScore);
+
+            g.append('path')
+                .attr('d', arc)
+                .attr('fill', fillColor)
+                .attr('stroke', 'none')
+                .on('mouseover', (event) => this.showTooltip(event, { time: new Date(timestamp), activityScore, hasData }))
+                .on('mouseout', () => this.hideTooltip());
+        });
+
+        // Draw faint grid circles for each day (optional)
+        for (let day = 0; day <= effectiveDays; day++) {
+            const radius = baseRadius + (day * radialStep);
+            g.append('circle')
+                .attr('cx', 0)
+                .attr('cy', 0)
+                .attr('r', radius)
+                .attr('fill', 'none')
+                .attr('stroke', '#f0f0f0')
+                .attr('stroke-width', 0.5);
+        }
+
+        // Draw radial grid lines for major time markers (midnight, 6am, noon, 6pm)
+        [0, 6, 12, 18].forEach(hour => {
+            const angle = ((hour / 24) * 2 * Math.PI) - (Math.PI / 2);
+            const x2 = Math.cos(angle) * maxRadius;
+            const y2 = Math.sin(angle) * maxRadius;
+
+            g.append('line')
+                .attr('x1', 0)
+                .attr('y1', 0)
+                .attr('x2', x2)
+                .attr('y2', y2)
+                .attr('stroke', '#e0e0e0')
+                .attr('stroke-width', 0.5)
+                .attr('stroke-dasharray', '2,2');
+
+            // Add time labels
+            const labelRadius = maxRadius + 20;
+            const labelX = Math.cos(angle) * labelRadius;
+            const labelY = Math.sin(angle) * labelRadius;
+
+            g.append('text')
+                .attr('x', labelX)
+                .attr('y', labelY)
+                .attr('text-anchor', 'middle')
+                .attr('dy', '0.35em')
+                .style('font-size', '10px')
+                .style('fill', '#999')
+                .text(`${hour}:00`);
+        });
+    }
+
+    /**
+     * Process data into spiral format
+     */
+    processDataToSpiral(data, daysToShow, epochDuration) {
+        const spiralData = [];
+
+        // Get date range
+        const endDate = new Date();
+        const startDate = new Date(endDate);
+        startDate.setDate(startDate.getDate() - daysToShow + 1);
+        startDate.setHours(0, 0, 0, 0);
+
+        const epochsPerDay = (24 * 60) / epochDuration;
+
+        for (let dayIndex = 0; dayIndex < daysToShow; dayIndex++) {
+            const currentDate = new Date(startDate);
+            currentDate.setDate(currentDate.getDate() + dayIndex);
+            currentDate.setHours(0, 0, 0, 0);
+
+            for (let epochIndex = 0; epochIndex < epochsPerDay; epochIndex++) {
+                const epochTime = new Date(currentDate);
+                const minutesFromMidnight = epochIndex * epochDuration;
+                epochTime.setMinutes(minutesFromMidnight);
+
+                // Find matching data point
+                const dataPoint = data.find(d => {
+                    const dataTime = new Date(d.timestamp);
+                    return Math.abs(dataTime - epochTime) < (epochDuration * 60 * 1000 / 2);
+                });
+
+                spiralData.push({
+                    dayIndex,
+                    minutesSinceMidnight: minutesFromMidnight,
+                    activityScore: dataPoint ? dataPoint.activityScore : 0,
+                    hasData: !!dataPoint,
+                    timestamp: epochTime.getTime()
+                });
+            }
+        }
+
+        return spiralData;
+    }
+
+    /**
      * Process raw data into grid format
      */
     processDataToGrid(data, daysToShow, epochDuration, plotType = 'double') {
@@ -313,24 +476,59 @@ class ActigramChart {
 
     /**
      * Render empty state
+     * @param {string} viewType - 'linear' or 'spiral'
      */
-    renderEmptyState() {
-        const g = this.config.svg.append('g')
-            .attr('class', 'empty-state')
-            .attr('transform', `translate(${this.config.width / 2}, 100)`);
+    renderEmptyState(viewType = 'linear') {
+        if (viewType === 'spiral') {
+            // Draw empty spiral with grid circle
+            const baseRadius = 40;
+            const g = this.config.svg.append('g')
+                .attr('class', 'empty-state')
+                .attr('transform', `translate(${this.config.width / 2}, ${this.config.width / 2})`);
 
-        g.append('text')
-            .attr('text-anchor', 'middle')
-            .style('font-size', '16px')
-            .style('fill', '#999')
-            .text('No activity data yet');
+            // Draw a faint circle to show where spiral would be
+            g.append('circle')
+                .attr('cx', 0)
+                .attr('cy', 0)
+                .attr('r', baseRadius)
+                .attr('fill', 'none')
+                .attr('stroke', '#ddd')
+                .attr('stroke-width', 1)
+                .attr('stroke-dasharray', '4,2');
 
-        g.append('text')
-            .attr('text-anchor', 'middle')
-            .attr('y', 30)
-            .style('font-size', '14px')
-            .style('fill', '#bbb')
-            .text('Start using your browser to collect data');
+            // Center text
+            g.append('text')
+                .attr('text-anchor', 'middle')
+                .attr('dy', '0.35em')
+                .style('font-size', '16px')
+                .style('fill', '#999')
+                .text('No activity data yet');
+
+            g.append('text')
+                .attr('text-anchor', 'middle')
+                .attr('dy', '2em')
+                .style('font-size', '14px')
+                .style('fill', '#bbb')
+                .text('Start using your browser to collect data');
+        } else {
+            // Linear empty state
+            const g = this.config.svg.append('g')
+                .attr('class', 'empty-state')
+                .attr('transform', `translate(${this.config.width / 2}, 100)`);
+
+            g.append('text')
+                .attr('text-anchor', 'middle')
+                .style('font-size', '16px')
+                .style('fill', '#999')
+                .text('No activity data yet');
+
+            g.append('text')
+                .attr('text-anchor', 'middle')
+                .attr('y', 30)
+                .style('font-size', '14px')
+                .style('fill', '#bbb')
+                .text('Start using your browser to collect data');
+        }
     }
 
     /**

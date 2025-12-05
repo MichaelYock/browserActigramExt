@@ -22,7 +22,8 @@ const StorageManager = {
 
     // Default UI preferences
     DEFAULT_UI_PREFERENCES: {
-        daysToShow: 2
+        daysToShow: 2,
+        chartView: 'linear'
     },
 
     /**

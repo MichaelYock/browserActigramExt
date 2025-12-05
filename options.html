@@ -67,6 +67,7 @@
                     <label for="retentionDays">
                         <strong>Data Retention Period</strong>
                         <span class="description">How long to keep activity data</span>
+                        <span class="description">Data is stored locally, never sent to a server</span>
                     </label>
                     <select id="retentionDays" class="setting-input">
                         <option value="30">30 days</option>
@@ -93,7 +94,7 @@
                 <div class="setting-item">
                     <label>
                         <strong>Export Data</strong>
-                        <span class="description">Download your activity data in various formats</span>
+                        <span class="description">Download your activity data in JSON or CSV formats</span>
                     </label>
                     <div class="export-buttons" style="display: flex; gap: 10px; flex-wrap: wrap;">
                         <button id="exportBtn" class="btn btn-primary">Export as JSON</button>
@@ -104,7 +105,8 @@
                 <div class="setting-item">
                     <label>
                         <strong>Import Data</strong>
-                        <span class="description">Upload and merge data from another device</span>
+                        <span class="description">Upload and merge previously exported JSON data</span>
+                        <span class="description">Ensure the JSON format matches</span>
                     </label>
                     <div class="import-controls">
                         <input type="file" id="importFile" accept=".json" style="display: none;">

@@ -5,6 +5,7 @@
 
 // State
 let currentDaysToShow = 2;
+let currentChartView = 'linear';
 let currentStartDate = new Date();
 let activityData = [];
 let settings = {};
@@ -36,6 +37,7 @@ async function initialize() {
     // Load UI preferences
     const uiPreferences = await StorageManager.getUIPreferences();
     currentDaysToShow = uiPreferences.daysToShow;
+    currentChartView = uiPreferences.chartView || 'linear';
 
     // Initialize chart (create new instance)
     chart = new ActigramChart('#actigram');
@@ -45,6 +47,7 @@ async function initialize() {
 
     // Set the dropdown to saved value
     document.getElementById('daysToShow').value = currentDaysToShow;
+    document.getElementById('chartView').value = currentChartView;
 
     // Load and display data
     await loadAndDisplayData();
@@ -79,6 +82,18 @@ function setupEventListeners() {
 
         // Save preference
         await StorageManager.saveUIPreferences({ daysToShow: currentDaysToShow });
+
+        loadAndDisplayData();
+    });
+
+    // Chart view selector
+    document.getElementById('chartView').addEventListener('change', async (e) => {
+        currentChartView = e.target.value;
+
+        // Save preference
+        const prefs = await StorageManager.getUIPreferences();
+        prefs.chartView = currentChartView;
+        await StorageManager.saveUIPreferences(prefs);
 
         loadAndDisplayData();
     });
@@ -225,7 +240,7 @@ async function loadAndDisplayData() {
         updateDateRangeDisplay(startDate, endDate);
 
         // Render chart
-        chart.render(activityData, daysToShow, settings.epochDuration, settings.plotType);
+        chart.render(activityData, daysToShow, settings.epochDuration, settings.plotType, currentChartView);
 
 
 
