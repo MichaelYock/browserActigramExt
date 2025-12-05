@@ -27,7 +27,7 @@ const ExportUtils = {
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `webactigram-export-${new Date().toISOString().split('T')[0]}.json`;
+            a.download = `browser-actogram-export-${new Date().toISOString().split('T')[0]}.json`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -83,7 +83,7 @@ const ExportUtils = {
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `webactigram-export-${new Date().toISOString().split('T')[0]}.csv`;
+            a.download = `browser-actogram-export-${new Date().toISOString().split('T')[0]}.csv`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -101,7 +101,7 @@ const ExportUtils = {
     /**
      * Export SVG chart to PNG image
      */
-    async exportToPng(svgElementId = 'actigram') {
+    async exportToPng(svgElementId = 'actogram') {
         try {
             const svg = document.getElementById(svgElementId);
             if (!svg) {
@@ -141,7 +141,7 @@ const ExportUtils = {
                         const pngUrl = URL.createObjectURL(blob);
                         const a = document.createElement('a');
                         a.href = pngUrl;
-                        a.download = `webactigram-${new Date().toISOString().split('T')[0]}.png`;
+                        a.download = `browser-actogram-${new Date().toISOString().split('T')[0]}.png`;
                         document.body.appendChild(a);
                         a.click();
                         document.body.removeChild(a);

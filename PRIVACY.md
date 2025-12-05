@@ -1,16 +1,16 @@
-# WebActigram - Privacy Policy
+# Browser Actogram - Privacy Policy
 
 Last Updated: November 30, 2025
 
 ## Overview
 
-WebActigram is a browser extension designed to track browser activity for personal sleep/wake cycle analysis. We are committed to protecting your privacy and being transparent about what data we collect and how we use it.
+Browser Actogram is a browser extension designed to track browser activity for personal sleep/wake cycle analysis. We are committed to protecting your privacy and being transparent about what data we collect and how we use it.
 
 ## Data Collection
 
 ### What We Collect
 
-WebActigram collects and stores the following data **locally on your device**:
+Browser Actogram collects and stores the following data **locally on your device**:
 
 1. **Activity Timestamps**: The date and time when each activity measurement was taken
 2. **Activity Scores**: A numerical value (0-100) representing the percentage of time your browser was active during a time epoch
@@ -18,7 +18,7 @@ WebActigram collects and stores the following data **locally on your device**:
 
 ### What We DO NOT Collect
 
-WebActigram explicitly does NOT collect:
+Browser Actogram explicitly does NOT collect:
 
 - ❌ URLs or web addresses you visit
 - ❌ Page titles or content
@@ -33,7 +33,7 @@ WebActigram explicitly does NOT collect:
 
 Your activity data is used solely to:
 
-1. Display your activity patterns in the actigram chart
+1. Display your activity patterns in the actogram chart
 2. Calculate statistics about your browser usage
 3. Provide insights into your potential sleep/wake cycles
 
@@ -69,7 +69,7 @@ You have complete control over your data:
 
 ## Permissions Explained
 
-WebActigram requests the following browser permissions:
+Browser Actogram requests the following browser permissions:
 
 - **`idle`**: To detect when your browser is active or idle
 - **`storage`**: To save your activity data and settings locally
@@ -92,8 +92,8 @@ If you have questions about this privacy policy or how your data is handled, ple
 
 ## Open Source
 
-WebActigram is open source. You can review all the code to verify our privacy claims at any time.
+Browser Actogram is open source. You can review all the code to verify our privacy claims at any time.
 
 ---
 
-**Summary**: WebActigram only tracks whether your browser is active or idle. It does not track what you do, where you go, or any personal information. All data stays on your device unless you explicitly export it.
+**Summary**: Browser Actogram only tracks whether your browser is active or idle. It does not track what you do, where you go, or any personal information. All data stays on your device unless you explicitly export it.

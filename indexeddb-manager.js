@@ -4,7 +4,7 @@
  */
 
 const IndexedDBManager = {
-    DB_NAME: 'WebActigramDB',
+    DB_NAME: 'ActogramDB',
     DB_VERSION: 2,
     STORES: {
         EPOCHS: 'epochs',

@@ -376,7 +376,15 @@ async function importHistory() {
  * Delete imported history
  */
 async function deleteHistoryData() {
-    if (!confirm('Are you sure you want to delete all imported history data? Your tracked activity will remain.')) {
+    const confirmed = await UIUtils.showConfirm(
+        'Are you sure you want to delete all imported history data? Your tracked activity will remain.',
+        'Delete History',
+        'Delete',
+        'Cancel',
+        'warning'
+    );
+
+    if (!confirmed) {
         return;
     }
 
@@ -418,9 +426,12 @@ async function checkHistoryDataExistence() {
  * Clear all data
  */
 async function clearAllData() {
-    const confirmed = confirm(
-        'Are you sure you want to delete ALL activity data?\n\n' +
-        'This action cannot be undone. Consider exporting your data first.'
+    const confirmed = await UIUtils.showConfirm(
+        'Are you sure you want to delete ALL activity data?\n\nThis action cannot be undone. Consider exporting your data first.',
+        'Clear All Data',
+        'Delete Data',
+        'Cancel',
+        'danger'
     );
 
     if (!confirmed) {
@@ -428,9 +439,12 @@ async function clearAllData() {
     }
 
     // Double confirmation
-    const doubleConfirmed = confirm(
-        'This is your last chance!\n\n' +
-        'Click OK to permanently delete all data.'
+    const doubleConfirmed = await UIUtils.showConfirm(
+        'This is your last chance!\n\nClick Delete to permanently delete all data.',
+        'Final Confirmation',
+        'Permanently Delete',
+        'Cancel',
+        'danger'
     );
 
     if (!doubleConfirmed) {

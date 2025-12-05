@@ -1,15 +1,15 @@
 /**
- * Actigram Chart using D3.js
- * Renders activity data as a heatmap-style actigram
+ * Actogram Chart using D3.js
+ * Renders activity data as a heatmap-style actogram
  */
 
-class ActigramChart {
+class ActogramChart {
     // Color thresholds for activity levels
     static colorThresholds = [0, 20, 40, 60, 80, 100];
     static colors = ['#E3F2FD', '#90CAF9', '#42A5F5', '#1E88E5', '#1565C0'];
 
     /**
-     * Create a new ActigramChart instance
+     * Create a new ActogramChart instance
      * @param {string} containerId - CSS selector for the SVG element
      * @param {number} width - Optional width override
      */
@@ -42,11 +42,11 @@ class ActigramChart {
         // Create color scale
         this.config.colorScale = d3.scaleThreshold()
             .domain([20, 40, 60, 80])
-            .range(ActigramChart.colors);
+            .range(ActogramChart.colors);
     }
 
     /**
-     * Render the actigram chart
+     * Render the actogram chart
      * @param {Array} data - Activity data array
      * @param {number} daysToShow - Number of days to display
      * @param {number} epochDuration - Duration of each epoch in minutes
@@ -77,7 +77,7 @@ class ActigramChart {
     }
 
     /**
-     * Render linear actigram chart
+     * Render linear actogram chart
      * @param {Array} data - Activity data array
      * @param {number} daysToShow - Number of days to display
      * @param {number} epochDuration - Duration of each epoch in minutes
@@ -97,10 +97,20 @@ class ActigramChart {
         const epochsPerRow = (hoursPerRow * 60) / epochDuration;
         const cellWidth = this.config.width / epochsPerRow;
 
-        // Calculate cellHeight so that height = width of one hour
+        // Calculate ideal cellHeight so that height = width of one hour
         // For a 15-min epoch: cellHeight = cellWidth * 4 (4 epochs per hour)
-        // For a 60-min epoch: cellHeight = cellWidth * 1 (1 epoch per hour)
-        const cellHeight = cellWidth * (60 / epochDuration);
+        const idealCellHeight = cellWidth * (60 / epochDuration);
+
+        // Calculate constrained cellHeight for A4 fit (Portrait)
+        // A4 Aspect Ratio = 297mm / 210mm ≈ 1.414
+        const A4_ASPECT_RATIO = 1.414;
+        const maxTotalHeight = this.config.width * A4_ASPECT_RATIO;
+        const constrainedCellHeight = maxTotalHeight / gridData.length;
+
+        // Use the smaller of the two heights to ensure it fits on A4 but doesn't get too tall
+        // But don't let it get too small (e.g. < 1px) unless absolutely necessary
+        const cellHeight = Math.max(0.5, Math.min(idealCellHeight, constrainedCellHeight));
+
         this.config.cellHeight = cellHeight;
         this.config.height = gridData.length * cellHeight;
 
@@ -196,8 +206,23 @@ class ActigramChart {
                     .attr('height', height)
                     .attr('fill', fillColor)
                     .attr('style', `fill: ${fillColor}`)
+                    .attr('tabindex', '0')
+                    .attr('role', 'graphics-symbol')
+                    .attr('aria-label', (d) => {
+                        const dateStr = epoch.time.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                        const timeStr = epoch.time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                        return `${dateStr} ${timeStr}, Activity: ${epoch.hasData ? epoch.activityScore + '%' : 'No data'}`;
+                    })
                     .on('mouseover', (event) => this.showTooltip(event, epoch))
-                    .on('mouseout', () => this.hideTooltip());
+                    .on('mouseout', () => this.hideTooltip())
+                    .on('focus', (event) => this.showTooltip(event, epoch))
+                    .on('blur', () => this.hideTooltip())
+                    .on('keydown', (event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault();
+                            this.showTooltip(event, epoch);
+                        }
+                    });
             });
 
             // Add separator line for double plot (at 24h mark)
@@ -215,7 +240,7 @@ class ActigramChart {
     }
 
     /**
-     * Render spiral (circular) actigram chart
+     * Render spiral (circular) actogram chart
      * @param {Array} data - Activity data array
      * @param {number} daysToShow - Number of days to display (max 90)
      * @param {number} epochDuration - Duration of each epoch in minutes
@@ -268,10 +293,26 @@ class ActigramChart {
 
             g.append('path')
                 .attr('d', arc)
+                .attr('d', arc)
                 .attr('fill', fillColor)
                 .attr('stroke', 'none')
+                .attr('tabindex', '0')
+                .attr('role', 'graphics-symbol')
+                .attr('aria-label', (d) => {
+                    const dateStr = new Date(timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                    const timeStr = new Date(timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                    return `${dateStr} ${timeStr}, Activity: ${hasData ? activityScore + '%' : 'No data'}`;
+                })
                 .on('mouseover', (event) => this.showTooltip(event, { time: new Date(timestamp), activityScore, hasData }))
-                .on('mouseout', () => this.hideTooltip());
+                .on('mouseout', () => this.hideTooltip())
+                .on('focus', (event) => this.showTooltip(event, { time: new Date(timestamp), activityScore, hasData }))
+                .on('blur', () => this.hideTooltip())
+                .on('keydown', (event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        this.showTooltip(event, { time: new Date(timestamp), activityScore, hasData });
+                    }
+                });
         });
 
         // Draw faint grid circles for each day (optional)
@@ -460,10 +501,21 @@ class ActigramChart {
             ? `<strong>${dateStr} ${timeStr}</strong><br/>Activity: ${epoch.activityScore}%`
             : `<strong>${dateStr} ${timeStr}</strong><br/>No data`;
 
+        // Handle keyboard events (where pageX/Y might be missing)
+        let x = event.pageX;
+        let y = event.pageY;
+
+        if (x === undefined || x === 0) {
+            // Position relative to the target element
+            const rect = event.target.getBoundingClientRect();
+            x = rect.left + window.scrollX + (rect.width / 2);
+            y = rect.top + window.scrollY;
+        }
+
         tooltip
             .html(content)
-            .style('left', (event.pageX + 10) + 'px')
-            .style('top', (event.pageY - 10) + 'px')
+            .style('left', (x + 10) + 'px')
+            .style('top', (y - 10) + 'px')
             .classed('visible', true);
     }
 
@@ -545,5 +597,5 @@ class ActigramChart {
 
 // Make available globally
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = ActigramChart;
+    module.exports = ActogramChart;
 }

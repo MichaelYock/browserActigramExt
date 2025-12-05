@@ -40,7 +40,7 @@ async function initialize() {
     currentChartView = uiPreferences.chartView || 'linear';
 
     // Initialize chart (create new instance)
-    chart = new ActigramChart('#actigram');
+    chart = new ActogramChart('#actogram');
 
     // Set up event listeners
     setupEventListeners();
@@ -288,10 +288,10 @@ async function exportToCsv() {
 }
 
 /**
- * Export actigram as PNG image
+ * Export actogram as PNG image
  */
 async function exportToPng() {
-    return await ExportUtils.exportToPng('actigram');
+    return await ExportUtils.exportToPng('actogram');
 }
 
 /**

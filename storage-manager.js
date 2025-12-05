@@ -210,8 +210,10 @@ const StorageManager = {
         try {
             await IndexedDBManager.clearAllData();
             console.log('All activity data cleared from IndexedDB');
+            return true;
         } catch (error) {
             console.error('Error clearing data:', error);
+            return false;
         }
     },
 

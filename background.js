@@ -33,7 +33,7 @@ async function initialize() {
     if (isInitialized || isInitializing) return;
     isInitializing = true;
 
-    console.log('WebActigram: Initializing background worker');
+    console.log('Browser Actogram: Initializing background worker');
 
     try {
         // Initialize storage
@@ -69,9 +69,9 @@ async function initialize() {
         chrome.alarms.create('cleanup', { periodInMinutes: 1440 }); // 24 hours
 
         isInitialized = true;
-        console.log('WebActigram: Initialization complete');
+        console.log('Browser Actogram: Initialization complete');
     } catch (error) {
-        console.error('WebActigram: Initialization failed', error);
+        console.error('Browser Actogram: Initialization failed', error);
     } finally {
         isInitializing = false;
     }
@@ -117,7 +117,7 @@ async function startTracking() {
         chrome.idle.onStateChanged.addListener(handleIdleStateChange);
     }
 
-    console.log('WebActigram: Activity tracking started');
+    console.log('Browser Actogram: Activity tracking started');
 }
 
 /**
@@ -135,7 +135,7 @@ async function stopTracking() {
         chrome.idle.onStateChanged.removeListener(handleIdleStateChange);
     }
 
-    console.log('WebActigram: Activity tracking stopped');
+    console.log('Browser Actogram: Activity tracking stopped');
 }
 
 /**
@@ -261,10 +261,10 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
  */
 chrome.runtime.onInstalled.addListener(async (details) => {
     if (details.reason === 'install') {
-        console.log('WebActigram: Extension installed');
+        console.log('Browser Actogram: Extension installed');
         await initialize();
     } else if (details.reason === 'update') {
-        console.log('WebActigram: Extension updated');
+        console.log('Browser Actogram: Extension updated');
         await initialize();
     }
 });
@@ -273,7 +273,7 @@ chrome.runtime.onInstalled.addListener(async (details) => {
  * Handle browser startup
  */
 chrome.runtime.onStartup.addListener(async () => {
-    console.log('WebActigram: Browser started');
+    console.log('Browser Actogram: Browser started');
     await initialize();
 });
 

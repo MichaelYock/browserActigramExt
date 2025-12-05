@@ -1,8 +1,8 @@
 {
     "manifest_version": 2,
-    "name": "WebActigram",
+    "name": "Browser Actogram",
     "version": "1.0.0",
-    "description": "Track browser activity and visualize it as an actigram for sleep/wake cycle analysis",
+    "description": "Track browser activity and visualize it as an actogram for sleep/wake cycle analysis",
     "permissions": [
         "idle",
         "storage",

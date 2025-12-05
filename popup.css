@@ -37,7 +37,7 @@ h1 {
 }
 
 .subtitle {
-  color: #666;
+  color: #555;
   font-size: 14px;
 }
 
@@ -72,7 +72,7 @@ h1 {
 
 .view-controls label {
   font-size: 14px;
-  color: #666;
+  color: #555;
 }
 
 .view-controls select {
@@ -133,7 +133,7 @@ h1 {
   min-height: 300px;
 }
 
-#actigram {
+#actogram {
   width: 100%;
   height: auto;
 }
@@ -147,7 +147,7 @@ h1 {
 
 .legend h3 {
   font-size: 14px;
-  color: #666;
+  color: #555;
   margin-bottom: 10px;
 }
 
@@ -198,7 +198,7 @@ footer {
 /* Chart specific styles */
 .axis text {
   font-size: 11px;
-  fill: #666;
+  fill: #555;
 }
 
 .axis line,
@@ -221,7 +221,7 @@ footer {
 .loading {
   text-align: center;
   padding: 40px;
-  color: #666;
+  color: #555;
   font-style: italic;
 }
 
@@ -229,12 +229,12 @@ footer {
 .empty-state {
   text-align: center;
   padding: 40px;
-  color: #999;
+  color: #777;
 }
 
 .empty-state h3 {
   margin-bottom: 10px;
-  color: #666;
+  color: #555;
 }
 
 .empty-state p {
@@ -319,7 +319,7 @@ footer {
     background: white !important;
   }
 
-  #actigram {
+  #actogram {
     width: 100% !important;
     height: auto !important;
     max-width: 100% !important;
