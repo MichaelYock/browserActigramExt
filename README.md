@@ -15,6 +15,7 @@ A simple, privacy-respecting browser extension that visualizes your online activ
 ## How to Use
 - **View Chart**: Click the extension icon to see your activity actogram.
 - **Settings**: Adjust time epochs (default: 15 mins) or export your data.
+- **Import Browser History**: Import past activity from your browser history (timestamps only).
 
 ## Feedback & Bugs
 Found a bug or have a suggestion?
